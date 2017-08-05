@@ -64,6 +64,8 @@ type MapReduce struct {
 	Workers map[string]*WorkerInfo
 
 	// add any additional state here
+	avaliableWorkers chan string // default buffer size is 100
+	tmpFailedWorkers chan string
 }
 
 func InitMapReduce(nmap int, nreduce int,
@@ -76,6 +78,10 @@ func InitMapReduce(nmap int, nreduce int,
 	mr.alive = true
 	mr.registerChannel = make(chan string)
 	mr.DoneChannel = make(chan bool)
+
+	//make buffered channel for availableWorkers
+	mr.avaliableWorkers = make(chan string, 100)
+	mr.tmpFailedWorkers = make(chan string, 100)
 
 	// initialize any additional state here
 	return mr
