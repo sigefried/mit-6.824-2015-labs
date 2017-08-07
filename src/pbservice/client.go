@@ -4,31 +4,24 @@ import "viewservice"
 import "net/rpc"
 import "fmt"
 
-import "crypto/rand"
-import "math/big"
-
+import "time"
 
 type Clerk struct {
 	vs *viewservice.Clerk
 	// Your declarations here
+	view *viewservice.View
 }
 
 // this may come in handy.
-func nrand() int64 {
-	max := big.NewInt(int64(1) << 62)
-	bigx, _ := rand.Int(rand.Reader, max)
-	x := bigx.Int64()
-	return x
-}
 
 func MakeClerk(vshost string, me string) *Clerk {
 	ck := new(Clerk)
 	ck.vs = viewservice.MakeClerk(me, vshost)
 	// Your ck.* initializations here
+	ck.view = nil
 
 	return ck
 }
-
 
 //
 // call() sends an RPC to the rpcname handler on server srv
@@ -64,6 +57,28 @@ func call(srv string, rpcname string,
 	return false
 }
 
+func (ck *Clerk) GetView(rpccall bool) *viewservice.View {
+	if ck.view == nil || rpccall {
+		v, ok := ck.vs.Get()
+		if ok {
+			ck.view = &v
+		} else {
+			ck.view = nil
+		}
+	}
+	return ck.view
+}
+
+func (ck *Clerk) GetPrimary(rpccall bool) string {
+	v := ck.GetView(rpccall)
+	for v == nil {
+		v = ck.GetView(rpccall)
+		time.Sleep(viewservice.PingInterval)
+		rpccall = true
+	}
+	return v.Primary
+}
+
 //
 // fetch a key's value from the current primary;
 // if they key has never been set, return "".
@@ -74,8 +89,24 @@ func call(srv string, rpcname string,
 func (ck *Clerk) Get(key string) string {
 
 	// Your code here.
+	getArgs := &GetArgs{key, nrand()}
+	var reply GetReply
 
-	return "???"
+	rpccall := false
+	for {
+		primary := ck.GetPrimary(rpccall)
+
+		call(primary, "PBServer.Get", getArgs, &reply)
+
+		if reply.Err == OK || reply.Err == ErrNoKey {
+			break
+		}
+
+		rpccall = true
+		time.Sleep(viewservice.PingInterval)
+	}
+
+	return reply.Value
 }
 
 //
@@ -84,6 +115,22 @@ func (ck *Clerk) Get(key string) string {
 func (ck *Clerk) PutAppend(key string, value string, op string) {
 
 	// Your code here.
+	putArgs := &PutAppendArgs{key, value, op, nrand()}
+	var reply PutAppendReply
+
+	rpccall := false
+	for {
+		primary := ck.GetPrimary(rpccall)
+
+		call(primary, "PBServer.PutAppend", putArgs, &reply)
+		//DPrintf("(viewnum: %d, primary: %s, backup: %s)\n", ck.view.Viewnum, ck.view.Primary, ck.view.Backup)
+
+		if reply.Err == OK {
+			break
+		}
+		rpccall = true
+		time.Sleep(viewservice.PingInterval)
+	}
 }
 
 //
