@@ -42,11 +42,11 @@ func (pb *PBServer) Get(args *GetArgs, reply *GetReply) error {
 		return fmt.Errorf(ErrWrongServer)
 	}
 
-	cache, ok := pb.operationCache[args.OpID]
-	if ok {
-		*reply = cache.Reply.(GetReply)
-		return nil
-	}
+	//cache, ok := pb.operationCache[args.OpID]
+	//if ok {
+	//	*reply = cache.Reply.(GetReply)
+	//	//return nil
+	//}
 
 	// check with backup
 	if pb.backup != "" {
@@ -67,8 +67,8 @@ func (pb *PBServer) Get(args *GetArgs, reply *GetReply) error {
 
 	pb.DoGet(args, reply)
 	// record operation
-	newcache := &CacheData{*reply, CacheExpiredPings}
-	pb.operationCache[args.OpID] = newcache
+	//newcache := &CacheData{*reply, CacheExpiredPings}
+	//pb.operationCache[args.OpID] = newcache
 	return nil
 }
 
@@ -82,21 +82,22 @@ func (pb *PBServer) BackupGet(args *GetArgs, reply *GetReply) error {
 		return nil
 	}
 
-	for !pb.isSynced {
-		time.Sleep(viewservice.PingInterval)
-	}
-
-	// detect duplicate
-	cache, ok := pb.operationCache[args.OpID]
-	if ok {
-		*reply = cache.Reply.(GetReply)
+	if !pb.isSynced {
+		reply.Err = ErrWrongServer
 		return nil
 	}
 
+	// detect duplicate
+	//cache, ok := pb.operationCache[args.OpID]
+	//if ok {
+	//	*reply = cache.Reply.(GetReply)
+	//	return nil
+	//}
+
 	pb.DoGet(args, reply)
 	// record operation
-	newcache := &CacheData{*reply, CacheExpiredPings}
-	pb.operationCache[args.OpID] = newcache
+	//newcache := &CacheData{*reply, CacheExpiredPings}
+	//pb.operationCache[args.OpID] = newcache
 	return nil
 }
 
@@ -178,8 +179,9 @@ func (pb *PBServer) BackupPutAppend(args *PutAppendArgs, reply *PutAppendReply) 
 		return nil
 	}
 
-	for !pb.isSynced {
-		time.Sleep(viewservice.PingInterval)
+	if !pb.isSynced {
+		reply.Err = ErrWrongServer
+		return nil
 	}
 
 	cache, ok := pb.operationCache[args.OpID]
@@ -216,12 +218,11 @@ func (pb *PBServer) SyncHandler(args *SyncReq, reply *SyncRep) error {
 }
 
 func (pb *PBServer) SyncData(req *SyncReq, rep *SyncRep) error {
-	for rep.Result == false {
-		ok := call(pb.backup, "PBServer.SyncHandler", req, rep)
-		if !ok {
-			return fmt.Errorf("SyncData Error")
-		}
+	ok := call(pb.backup, "PBServer.SyncHandler", req, rep)
+	if !ok {
+		return fmt.Errorf("SyncData Error")
 	}
+
 	return nil
 }
 
