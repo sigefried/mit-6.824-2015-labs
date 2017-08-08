@@ -36,8 +36,9 @@ type PutAppendArgs struct {
 }
 
 type CacheData struct {
-	Reply interface{}
-	TTL   int
+	OpIdToReply  map[int64]interface{}
+	OpIdToMethod map[int64]string
+	TTL          int
 }
 
 type PutAppendReply struct {

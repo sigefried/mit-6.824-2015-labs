@@ -17,12 +17,10 @@ type ViewServer struct {
 	me       string
 
 	// Your declarations here.
-	primary  string
-	backup   string
-	viewnum  uint
-	lastview uint
-
-	serverBeat map[string]time.Time
+	curView      View
+	isPrimaryAck bool
+	nextView     View
+	serverBeat   map[string]time.Time
 }
 
 //
@@ -34,24 +32,52 @@ func (vs *ViewServer) Ping(args *PingArgs, reply *PingReply) error {
 	vs.mu.Lock()
 	defer vs.mu.Unlock()
 
-	if vs.primary == "" {
-		vs.viewnum++
-		vs.primary = args.Me
-	} else if vs.backup == "" && vs.primary != args.Me {
-		vs.viewnum++
-		vs.backup = args.Me
-	} else if vs.primary == args.Me && args.Viewnum == 0 {
-		vs.primary, vs.backup = vs.backup, vs.primary
-		vs.viewnum++
+	// server beat update
+	vs.serverBeat[args.Me] = time.Now()
+
+	if args.Me == vs.curView.Primary {
+		// deal with primary fails come back immediately
+		if args.Viewnum == 0 {
+			if vs.curView.Backup == "" {
+				vs.nextView.Primary = ""
+				vs.nextView.Backup = ""
+			} else {
+				vs.nextView.Primary = vs.curView.Backup
+				vs.nextView.Backup = args.Me
+			}
+			vs.nextView.Viewnum = vs.curView.Viewnum + 1
+		}
+
+		// process primary ack
+		if args.Viewnum == vs.curView.Viewnum {
+			vs.isPrimaryAck = true
+		}
+	} else if args.Me == vs.curView.Backup {
+		// do nothing
+
+	} else {
+		// new server
+
+		// init state
+		if vs.curView.Primary == "" && vs.curView.Viewnum == 0 {
+			vs.curView.Primary = args.Me
+			vs.curView.Viewnum++
+			vs.nextView = vs.curView
+		} else if vs.curView.Backup == "" {
+			// no backup
+			vs.nextView.Primary = vs.curView.Primary
+			vs.nextView.Backup = args.Me
+			vs.nextView.Viewnum = vs.curView.Viewnum + 1
+		}
+
 	}
 
-	if args.Me == vs.primary {
-		vs.lastview = args.Viewnum
+	if vs.isPrimaryAck && vs.curView.Viewnum < vs.nextView.Viewnum {
+		vs.curView = vs.nextView
+		vs.isPrimaryAck = false
+		vs.nextView = View{0, "", ""}
 	}
-	vs.serverBeat[args.Me] = time.Now()
-	reply.View.Backup = vs.backup
-	reply.View.Primary = vs.primary
-	reply.View.Viewnum = vs.viewnum
+	reply.View = vs.curView
 
 	return nil
 }
@@ -65,9 +91,7 @@ func (vs *ViewServer) Get(args *GetArgs, reply *GetReply) error {
 	vs.mu.Lock()
 	defer vs.mu.Unlock()
 
-	reply.View.Primary = vs.primary
-	reply.View.Backup = vs.backup
-	reply.View.Viewnum = vs.viewnum
+	reply.View = vs.curView
 
 	return nil
 }
@@ -81,32 +105,34 @@ func (vs *ViewServer) tick() {
 	vs.mu.Lock()
 	defer vs.mu.Unlock()
 	// Your code here.
-
-	idle := make([]string, 0)
+	idleServer := make([]string, 0)
 	cur := time.Now().UnixNano()
-	for n, d := range vs.serverBeat {
-		if (cur-d.UnixNano())/int64(PingInterval) >= DeadPings &&
-			vs.lastview == vs.viewnum {
-			if n == vs.primary {
-				vs.primary, vs.backup = vs.backup, ""
-				vs.viewnum++
-			} else if n == vs.backup {
-				vs.backup = ""
-				vs.viewnum++
+	for name, t := range vs.serverBeat {
+		if (cur-t.UnixNano())/int64(PingInterval) >= DeadPings {
+			if name == vs.curView.Primary && vs.isPrimaryAck {
+				vs.nextView.Primary, vs.nextView.Backup = vs.curView.Backup, ""
+				vs.nextView.Viewnum = vs.curView.Viewnum + 1
+			} else if name == vs.curView.Backup && vs.isPrimaryAck {
+				vs.nextView.Primary, vs.nextView.Backup = vs.curView.Primary, ""
+				vs.nextView.Viewnum = vs.curView.Viewnum + 1
 			}
-		} else if (cur-d.UnixNano())/int64(PingInterval) < DeadPings {
-			idle = append(idle, n)
+		} else if (cur-t.UnixNano())/int64(PingInterval) < DeadPings {
+			idleServer = append(idleServer, name)
 		}
 	}
 
-	if vs.backup == "" {
-		for _, d := range idle {
-			if d != vs.primary {
-				//DPrintf("----backup name: %s\n", d)
-				vs.backup = d
+	if vs.nextView.Backup == "" {
+		for _, name := range idleServer {
+			if name != vs.nextView.Primary {
+				vs.nextView.Backup = name
 				break
 			}
 		}
+	}
+	if vs.isPrimaryAck && vs.curView.Viewnum < vs.nextView.Viewnum {
+		vs.curView = vs.nextView
+		vs.isPrimaryAck = false
+		vs.nextView = View{0, "", ""}
 	}
 }
 
@@ -136,8 +162,9 @@ func StartServer(me string) *ViewServer {
 	vs := new(ViewServer)
 	vs.me = me
 	// Your vs.* initializations here.
-	vs.viewnum = 0
-	vs.lastview = 0
+	vs.curView = View{0, "", ""}
+	vs.nextView = View{0, "", ""}
+	vs.isPrimaryAck = true
 	vs.serverBeat = make(map[string]time.Time)
 
 	// tell net/rpc about our RPC server and handlers.

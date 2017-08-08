@@ -12,7 +12,7 @@ import "os"
 import "syscall"
 import "math/rand"
 
-const CacheExpiredPings = 10
+const CacheExpiredPings = 100
 
 type PBServer struct {
 	mu         sync.Mutex
@@ -23,7 +23,7 @@ type PBServer struct {
 	vs         *viewservice.Clerk
 	// Your declarations here.
 	kvstore        map[string]string
-	operationCache map[int64]*CacheData
+	operationCache map[string]*CacheData
 	isPrimary      bool
 	view           viewservice.View
 	backup         string
@@ -114,6 +114,73 @@ func (pb *PBServer) DoGet(args *GetArgs, reply *GetReply) error {
 	return nil
 }
 
+func (pb *PBServer) ScanCache(args *PutAppendArgs, reply *PutAppendReply) bool {
+	// find cache
+	cache, ok := pb.operationCache[args.Key]
+	if !ok {
+		return false
+	}
+
+	if args.Method == "Put" {
+		method, exist := cache.OpIdToMethod[args.OpID]
+		if !exist {
+			return false
+		} else {
+			if method == "Put" {
+				*reply = cache.OpIdToReply[args.OpID].(PutAppendReply)
+				return true
+			} else {
+				return false
+			}
+		}
+
+	} else if args.Method == "Append" {
+		method, exist := cache.OpIdToMethod[args.OpID]
+		if !exist {
+			return false
+		} else {
+			if method == "Append" {
+				*reply = cache.OpIdToReply[args.OpID].(PutAppendReply)
+				return true
+			} else {
+				return false
+			}
+		}
+
+	}
+
+	return true
+}
+
+func (pb *PBServer) UpdateCache(args *PutAppendArgs, reply *PutAppendReply) {
+	if args.Method == "Put" {
+		cache := new(CacheData)
+		cache.OpIdToMethod = make(map[int64]string)
+		cache.OpIdToReply = make(map[int64]interface{})
+		cache.OpIdToReply[args.OpID] = *reply
+		cache.TTL = CacheExpiredPings
+		pb.operationCache[args.Key] = cache
+	} else if args.Method == "Append" {
+		_, ok := pb.operationCache[args.Key]
+		if !ok {
+			// not exist
+			cache := new(CacheData)
+			cache.OpIdToMethod = make(map[int64]string)
+			cache.OpIdToReply = make(map[int64]interface{})
+			cache.OpIdToReply[args.OpID] = *reply
+			cache.TTL = CacheExpiredPings
+			pb.operationCache[args.Key] = cache
+		} else {
+			//already exist
+			pb.operationCache[args.Key].OpIdToMethod[args.OpID] = "Append"
+			pb.operationCache[args.Key].OpIdToReply[args.OpID] = *reply
+			pb.operationCache[args.Key].TTL = CacheExpiredPings
+		}
+
+	}
+
+}
+
 func (pb *PBServer) DoPutAppend(args *PutAppendArgs, reply *PutAppendReply) error {
 
 	if args.Method == "Put" {
@@ -134,11 +201,15 @@ func (pb *PBServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) error 
 		reply.Err = ErrWrongServer
 		return fmt.Errorf(ErrWrongServer)
 	}
-	//DPrintf("PutAppend: {{me: %s == viewnum: %d, primary: %s, backup: %s\n}}\n", pb.me, pb.view.Viewnum, pb.view.Primary, pb.view.Backup)
 
-	cache, ok := pb.operationCache[args.OpID]
-	if ok {
-		*reply = cache.Reply.(PutAppendReply)
+	//cache, ok := pb.operationCache[args.Key]
+	//if ok && cache.OpId == args.OpID {
+	//	*reply = cache.Reply.(PutAppendReply)
+	//	//log.Printf("PutAppend-Cached: {{me: %s method: %s == viewnum: %d, , key: %s value: %s}}\n", pb.me, args.Method, pb.viewnum, args.Key, args.Value)
+	//	return nil
+	//}
+	isHit := pb.ScanCache(args, reply)
+	if isHit {
 		return nil
 	}
 
@@ -162,10 +233,12 @@ func (pb *PBServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) error 
 	}
 
 	pb.DoPutAppend(args, reply)
+	//log.Printf("PutAppend: {{me: %s method: %s  == viewnum: %d, key: %s value: %s}}\n", pb.me, args.Method, pb.viewnum, args.Key, args.Value)
 
 	//record operation
-	newcache := &CacheData{*reply, CacheExpiredPings}
-	pb.operationCache[args.OpID] = newcache
+	//newcache := &CacheData{*reply, args.OpID, CacheExpiredPings}
+	//pb.operationCache[args.Key] = newcache
+	pb.UpdateCache(args, reply)
 
 	return nil
 }
@@ -184,17 +257,24 @@ func (pb *PBServer) BackupPutAppend(args *PutAppendArgs, reply *PutAppendReply) 
 		return nil
 	}
 
-	cache, ok := pb.operationCache[args.OpID]
-	if ok {
-		*reply = cache.Reply.(PutAppendReply)
+	//cache, ok := pb.operationCache[args.Key]
+	//if ok && cache.OpId == args.OpID {
+	//	//log.Printf("BackupAppend-cached: {{me: %s == viewnum: %d, key: %s value: %s}}\n", pb.me, pb.viewnum, args.Key, args.Value)
+	//	*reply = cache.Reply.(PutAppendReply)
+	//	return nil
+	//}
+	isHit := pb.ScanCache(args, reply)
+	if isHit {
 		return nil
 	}
 
+	//log.Printf("BackupAppend: {{me: %s == viewnum: %d, key: %s value: %s}}\n", pb.me, pb.viewnum, args.Key, args.Value)
 	pb.DoPutAppend(args, reply)
 
 	//record operation
-	newcache := &CacheData{*reply, CacheExpiredPings}
-	pb.operationCache[args.OpID] = newcache
+	//newcache := &CacheData{*reply, args.OpID, CacheExpiredPings}
+	//pb.operationCache[args.Key] = newcache
+	pb.UpdateCache(args, reply)
 	return nil
 }
 
@@ -227,13 +307,14 @@ func (pb *PBServer) SyncData(req *SyncReq, rep *SyncRep) error {
 }
 
 func (pb *PBServer) CleanCache() {
-	for opid := range pb.operationCache {
-		if pb.operationCache[opid].TTL == 0 {
-			delete(pb.operationCache, opid)
+	for key := range pb.operationCache {
+		if pb.operationCache[key].TTL <= 0 {
+			delete(pb.operationCache, key)
 		} else {
-			pb.operationCache[opid].TTL--
+			pb.operationCache[key].TTL--
 		}
 	}
+
 }
 
 //
@@ -254,7 +335,7 @@ func (pb *PBServer) tick() {
 		// copy current view
 		pb.viewnum = new_view.Viewnum
 		pb.view = new_view
-		//DPrintf("tick: {{me: %s == viewnum: %d, primary: %s, backup: %s}}\n", pb.me, pb.view.Viewnum, pb.view.Primary, pb.view.Backup)
+		//log.Printf("tick: {{me: %s == viewnum: %d, primary: %s, backup: %s}}\n", pb.me, pb.view.Viewnum, pb.view.Primary, pb.view.Backup)
 		if pb.me == new_view.Primary {
 			pb.isPrimary = true
 			if new_view.Backup != "" && new_view.Backup != pb.backup {
@@ -310,7 +391,7 @@ func StartServer(vshost string, me string) *PBServer {
 	pb.vs = viewservice.MakeClerk(me, vshost)
 	// Your pb.* initializations here.
 	pb.kvstore = make(map[string]string)
-	pb.operationCache = make(map[int64]*CacheData)
+	pb.operationCache = make(map[string]*CacheData)
 	pb.isPrimary = false
 	pb.view = viewservice.View{0, "", ""}
 	pb.needSync = true
