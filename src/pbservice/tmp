@@ -1,0 +1,126 @@
+x @->/var/tmp/824-1000/pb-12939-csu-1: write: broken pipe
+unexpected EOF
+2017/08/08 14:03:52 PutAppend-Cached: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 7499645943750935004}}
+unexpected EOF
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 4097919894958473620}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 4097919894958473620}}
+2017/08/08 14:03:52 BackupAppend-cached: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 4707304530930680524}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 4707304530930680524}}
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 5541629711219269373}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 5541629711219269373}}
+write unix @->/var/tmp/824-1000/pb-12939-csu-1: write: broken pipe
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 3989060203872450403}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 3989060203872450403}}
+write unix @->/var/tmp/824-1000/pb-12939-csu-1: write: broken pipe
+write unix @->/var/tmp/824-1000/pb-12939-csu-1: write: broken pipe
+write unix @->/var/tmp/824-1000/pb-12939-csu-2: write: broken pipe
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 2545160787773396937}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 2545160787773396937}}
+unexpected EOF
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 1095556782849277153}}
+2017/08/08 14:03:52 PutAppend-Cached: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 4097919894958473620}}
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 6524501649919081415}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 6524501649919081415}}
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 7283926531522325137}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 7283926531522325137}}
+unexpected EOF
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 4542294363809403200}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 4542294363809403200}}
+unexpected EOF
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 8714075048080380302}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 8714075048080380302}}
+read unix @->/var/tmp/824-1000/pb-12939-csu-1: read: connection reset by peer
+write unix @->/var/tmp/824-1000/pb-12939-csu-2: write: broken pipe
+2017/08/08 14:03:52 PutAppend-Cached: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 4542294363809403200}}
+unexpected EOF
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 5719368897106619876}}
+2017/08/08 14:03:52 PutAppend-Cached: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 8714075048080380302}}
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 6223761054312842922}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 6223761054312842922}}
+read unix @->/var/tmp/824-1000/pb-12939-csu-1: read: connection reset by peer
+unexpected EOF
+2017/08/08 14:03:52 BackupAppend-cached: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 1095556782849277153}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 1095556782849277153}}
+2017/08/08 14:03:52 BackupAppend-cached: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 5719368897106619876}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 5719368897106619876}}
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 5772863692956070543}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 5772863692956070543}}
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 7393069135664176101}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 7393069135664176101}}
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 1317008329471590133}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 1317008329471590133}}
+unexpected EOF
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 3710600550242061153}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 3710600550242061153}}
+write unix @->/var/tmp/824-1000/pb-12939-csu-2: write: broken pipe
+2017/08/08 14:03:52 PutAppend-Cached: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 1095556782849277153}}
+write unix @->/var/tmp/824-1000/pb-12939-csu-1: write: broken pipe
+2017/08/08 14:03:52 PutAppend-Cached: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 3710600550242061153}}
+unexpected EOF
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 4622028038630006629}}
+unexpected EOF
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 5220187067533547065}}
+unexpected EOF
+2017/08/08 14:03:52 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 2599932489493805796}}
+2017/08/08 14:03:52 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 2599932489493805796}}
+unexpected EOF
+unexpected EOF
+2017/08/08 14:03:52 BackupAppend-cached: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 4622028038630006629}}
+write unix @->/var/tmp/824-1000/pb-12939-csu-2: write: broken pipe
+2017/08/08 14:03:52 PutAppend-Cached: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 2599932489493805796}}
+read unix @->/var/tmp/824-1000/pb-12939-csu-1: read: connection reset by peer
+unexpected EOF
+2017/08/08 14:03:53 BackupAppend-cached: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 4622028038630006629}}
+2017/08/08 14:03:53 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 4622028038630006629}}
+unexpected EOF
+unexpected EOF
+2017/08/08 14:03:53 BackupAppend-cached: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 5220187067533547065}}
+unexpected EOF
+2017/08/08 14:03:53 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 5877242846284716271}}
+unexpected EOF
+2017/08/08 14:03:53 PutAppend-Cached: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 4622028038630006629}}
+write unix @->/var/tmp/824-1000/pb-12939-csu-1: write: broken pipe
+write unix @->/var/tmp/824-1000/pb-12939-csu-1: write: broken pipe
+unexpected EOF
+2017/08/08 14:03:53 PutAppend-Cached: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 4622028038630006629}}
+read unix @->/var/tmp/824-1000/pb-12939-csu-1: read: connection reset by peer
+2017/08/08 14:03:53 BackupAppend-cached: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 5220187067533547065}}
+2017/08/08 14:03:53 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 5220187067533547065}}
+2017/08/08 14:03:53 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 443580643661881013}}
+2017/08/08 14:03:53 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 443580643661881013}}
+2017/08/08 14:03:53 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 8451491444548836540}}
+2017/08/08 14:03:53 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 8451491444548836540}}
+2017/08/08 14:03:53 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 2639241494560821356}}
+2017/08/08 14:03:53 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 2639241494560821356}}
+unexpected EOF
+2017/08/08 14:03:53 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 1181369011000817012}}
+2017/08/08 14:03:53 BackupAppend-cached: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 5877242846284716271}}
+2017/08/08 14:03:53 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 5877242846284716271}}
+unexpected EOF
+2017/08/08 14:03:53 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 5498794366381076579}}
+2017/08/08 14:03:53 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 5498794366381076579}}
+unexpected EOF
+2017/08/08 14:03:53 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 8711595222058163016}}
+unexpected EOF
+2017/08/08 14:03:53 BackupAppend-cached: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 1181369011000817012}}
+2017/08/08 14:03:53 PutAppend-Cached: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 5498794366381076579}}
+2017/08/08 14:03:53 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 903014235623349608}}
+2017/08/08 14:03:53 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 903014235623349608}}
+unexpected EOF
+2017/08/08 14:03:53 BackupAppend: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 1956366086192612921}}
+2017/08/08 14:03:53 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 1956366086192612921}}
+unexpected EOF
+2017/08/08 14:03:53 BackupAppend-cached: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 0 value: 8711595222058163016}}
+2017/08/08 14:03:53 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 0 value: 8711595222058163016}}
+2017/08/08 14:03:53 BackupAppend-cached: {{me: /var/tmp/824-1000/pb-12939-csu-2 == viewnum: 2, key: 1 value: 1181369011000817012}}
+2017/08/08 14:03:53 PutAppend: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 1181369011000817012}}
+2017/08/08 14:03:53 PutAppend-Cached: {{me: /var/tmp/824-1000/pb-12939-csu-1 == viewnum: 2, key: 1 value: 1956366086192612921}}
+write unix @->/var/tmp/824-1000/pb-12939-csu-1: write: broken pipe
+write unix @->/var/tmp/824-1000/pb-12939-csu-2: write: broken pipe
+unexpected EOF
+--- FAIL: TestConcurrentSameUnreliable (7.98s)
+        test_test.go:651: Get(0) from backup; wanted 8711595222058163016, got 903014235623349608
+FAIL
+exit status 1
+FAIL    pbservice       7.988s
+

@@ -31,12 +31,29 @@ import "sync/atomic"
 import "fmt"
 import "math/rand"
 
+import "time"
+
+// for debugging
+const Debug = 0
+
+func DPrintf(format string, a ...interface{}) {
+	if Debug > 0 {
+		fmt.Printf(format, a...)
+	}
+}
 
 // px.Status() return values, indicating
 // whether an agreement has been decided,
 // or Paxos has not yet reached agreement,
 // or it was agreed but forgotten (i.e. < Min()).
 type Fate int
+type ErrCode int
+
+const (
+	ErrOK ErrCode = iota + 1
+	ErrReject
+	ErrRpc
+)
 
 const (
 	Decided   Fate = iota + 1
@@ -53,8 +70,48 @@ type Paxos struct {
 	peers      []string
 	me         int // index into peers[]
 
-
 	// Your data here.
+	instance map[int]*PaxosInst
+	done     []int
+}
+
+type PaxosInst struct {
+	status  Fate
+	value   interface{}
+	platest int64
+	alatest int64
+}
+
+type PrepareReq struct {
+	Seq   int
+	Stamp int64
+}
+
+type PrepareRsp struct {
+	Code  ErrCode
+	Value interface{}
+	Stamp int64
+}
+
+type AcceptReq struct {
+	Seq   int
+	Value interface{}
+	Stamp int64
+}
+
+type AcceptRsp struct {
+	Code ErrCode
+}
+
+type DecideReq struct {
+	Seq   int
+	Value interface{}
+	// piggyback the done value
+	PiggyDoneId    int
+	PiggyDoneState int
+}
+
+type DecideRsp struct {
 }
 
 //
@@ -93,6 +150,168 @@ func call(srv string, name string, args interface{}, reply interface{}) bool {
 	return false
 }
 
+func (px *Paxos) PrepareHandler(req *PrepareReq, rsp *PrepareRsp) error {
+	px.mu.Lock()
+	defer px.mu.Unlock()
+
+	inst, ok := px.instance[req.Seq]
+	if !ok {
+		inst = &PaxosInst{Pending, nil, req.Stamp, 0}
+		px.instance[req.Seq] = inst
+		rsp.Code = ErrOK
+	} else if req.Stamp > inst.platest { //NOT THE SAME TAMP????
+		inst.platest = req.Stamp
+		rsp.Code = ErrOK
+	} else {
+		rsp.Code = ErrReject
+	}
+
+	rsp.Value = inst.value
+	rsp.Stamp = inst.alatest
+	return nil
+}
+
+func (px *Paxos) AcceptHandler(req *AcceptReq, rsp *AcceptRsp) error {
+	px.mu.Lock()
+	defer px.mu.Unlock()
+
+	inst, ok := px.instance[req.Seq]
+
+	if !ok {
+		inst = &PaxosInst{Pending, req.Value, req.Stamp, req.Stamp}
+		px.instance[req.Seq] = inst
+		rsp.Code = ErrOK
+	} else if inst.platest <= req.Stamp {
+		inst.alatest = req.Stamp
+		inst.platest = req.Stamp
+		inst.value = req.Value
+		rsp.Code = ErrOK
+	} else {
+		rsp.Code = ErrReject
+	}
+	return nil
+}
+
+func (px *Paxos) DecisionHandler(req *DecideReq, rsp *DecideRsp) error {
+	px.mu.Lock()
+	defer px.mu.Unlock()
+	inst, ok := px.instance[req.Seq]
+	//set value
+	if !ok {
+		inst = &PaxosInst{Decided, req.Value, 0, 0}
+		px.instance[req.Seq] = inst
+	} else {
+		inst.status = Decided
+		inst.value = req.Value
+	}
+
+	// update done state
+	px.done[req.PiggyDoneId] = req.PiggyDoneState
+	return nil
+}
+
+func (px *Paxos) sendPrepare(seq int, v interface{}) (bool, int64, interface{}) {
+	ch := make(chan PrepareRsp, len(px.peers))
+	timestamp := time.Now().UnixNano()
+	for i, p := range px.peers {
+		if i == px.me {
+			go func() {
+				rsp := PrepareRsp{}
+				px.PrepareHandler(&PrepareReq{seq, timestamp}, &rsp)
+				ch <- rsp
+			}()
+		} else {
+			go func(host string) {
+				rsp := PrepareRsp{}
+				if !call(host, "Paxos.PrepareHandler", &PrepareReq{seq, timestamp}, &rsp) {
+					rsp.Code = ErrRpc
+				}
+				ch <- rsp
+			}(p)
+		}
+	}
+
+	// count response
+	agreed := 0
+	highest := int64(0)
+	nv := interface{}(nil)
+	for i := 0; i < len(px.peers); i++ {
+		rsp := <-ch
+		if rsp.Code == ErrOK {
+			agreed++
+			if rsp.Stamp > highest {
+				highest = rsp.Stamp
+				nv = rsp.Value
+			}
+		}
+	}
+
+	// if less than n/2 peers agree, failed
+	if agreed <= len(px.peers)/2 {
+		return false, timestamp, nv
+	}
+
+	return true, timestamp, nv
+}
+
+func (px *Paxos) sendAccept(seq int, v interface{}, stamp int64) bool {
+	ch := make(chan AcceptRsp, len(px.peers))
+	for i, p := range px.peers {
+		if i == px.me {
+			go func() {
+				rsp := AcceptRsp{}
+				px.AcceptHandler(&AcceptReq{seq, v, stamp}, &rsp)
+				ch <- rsp
+			}()
+		} else {
+			go func(host string) {
+				rsp := AcceptRsp{}
+				if !call(host, "Paxos.AcceptHandler", &AcceptReq{seq, v, stamp}, &rsp) {
+					rsp.Code = ErrRpc
+				}
+				ch <- rsp
+			}(p)
+		}
+	}
+
+	accept := 0
+	for i := 0; i < len(px.peers); i++ {
+		rsp := <-ch
+		if rsp.Code == ErrOK {
+			accept++
+		}
+	}
+
+	if accept <= len(px.peers)/2 {
+		return false
+	}
+	return true
+}
+
+func (px *Paxos) sendDecision(seq int, v interface{}) {
+	ch := make(chan DecideRsp, len(px.peers))
+
+	for i, p := range px.peers {
+		if i == px.me {
+			go func() {
+				rsp := DecideRsp{}
+				px.DecisionHandler(&DecideReq{seq, v, px.me, px.done[px.me]}, &rsp)
+				ch <- rsp
+			}()
+		} else {
+			go func(host string) {
+				rsp := DecideRsp{}
+				call(host, "Paxos.DecisionHandler", &DecideReq{seq, v, px.me, px.done[px.me]}, &rsp)
+				ch <- rsp
+			}(p)
+		}
+	}
+
+	// wait all peers response
+	for i := 0; i < len(px.peers); i++ {
+		<-ch
+	}
+}
 
 //
 // the application wants paxos to start agreement on
@@ -103,6 +322,34 @@ func call(srv string, name string, args interface{}, reply interface{}) bool {
 //
 func (px *Paxos) Start(seq int, v interface{}) {
 	// Your code here.
+	if seq < px.Min() {
+		return
+	}
+
+	//goruotine
+	go func() {
+		for {
+			ok, t, nv := px.sendPrepare(seq, v)
+			if !ok {
+				// if prepare failed retry
+				continue
+			} else if nv != nil {
+				// someone has already have remember v
+				v = nv
+			}
+
+			ok = px.sendAccept(seq, v, t)
+
+			if !ok {
+				// if accept failed retry
+				continue
+			}
+
+			//done
+			px.sendDecision(seq, v)
+			break
+		}
+	}()
 }
 
 //
@@ -113,6 +360,11 @@ func (px *Paxos) Start(seq int, v interface{}) {
 //
 func (px *Paxos) Done(seq int) {
 	// Your code here.
+	px.mu.Lock()
+	defer px.mu.Unlock()
+	if seq >= px.done[px.me] {
+		px.done[px.me] = seq
+	}
 }
 
 //
@@ -122,7 +374,15 @@ func (px *Paxos) Done(seq int) {
 //
 func (px *Paxos) Max() int {
 	// Your code here.
-	return 0
+	px.mu.Lock()
+	defer px.mu.Unlock()
+	rst := 0
+	for i, _ := range px.instance {
+		if i > rst {
+			rst = i
+		}
+	}
+	return rst
 }
 
 //
@@ -155,7 +415,22 @@ func (px *Paxos) Max() int {
 //
 func (px *Paxos) Min() int {
 	// You code here.
-	return 0
+	px.mu.Lock()
+	defer px.mu.Unlock()
+	rst := 0x3fffffff
+	for _, d := range px.done {
+		if rst > d {
+			rst = d
+		}
+	}
+
+	//shrink
+	for seq, inst := range px.instance {
+		if seq < rst && inst.status == Decided {
+			delete(px.instance, seq)
+		}
+	}
+	return rst + 1
 }
 
 //
@@ -167,10 +442,17 @@ func (px *Paxos) Min() int {
 //
 func (px *Paxos) Status(seq int) (Fate, interface{}) {
 	// Your code here.
+	if seq < px.Min() {
+		return Forgotten, nil
+	}
+	px.mu.Lock()
+	defer px.mu.Unlock()
+
+	if inst, ok := px.instance[seq]; ok && inst.status == Decided {
+		return Decided, inst.value
+	}
 	return Pending, nil
 }
-
-
 
 //
 // tell the peer to shut itself down.
@@ -214,8 +496,12 @@ func Make(peers []string, me int, rpcs *rpc.Server) *Paxos {
 	px.peers = peers
 	px.me = me
 
-
 	// Your initialization code here.
+	px.done = make([]int, len(peers))
+	px.instance = make(map[int]*PaxosInst)
+	for i := 0; i < len(peers); i++ {
+		px.done[i] = -1
+	}
 
 	if rpcs != nil {
 		// caller will create socket &c
@@ -267,7 +553,6 @@ func Make(peers []string, me int, rpcs *rpc.Server) *Paxos {
 			}
 		}()
 	}
-
 
 	return px
 }

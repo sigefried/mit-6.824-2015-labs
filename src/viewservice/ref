@@ -1,0 +1,125 @@
+Test: First primary ...
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 0] curViewnum:1, curPrimary: /var/tmp/824-1000/viewserver-5321-1, curBackup 
+  ... Passed
+Test: First backup ...
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 1] curViewnum:1, curPrimary: /var/tmp/824-1000/viewserver-5321-1, curBackup 
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:2, curPrimary: /var/tmp/824-1000/viewserver-5321-1, curBackup /var/tmp/824-1000/viewserver-5321-2
+  ... Passed
+Test: Backup takes over if primary fails ...
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 2] curViewnum:2, curPrimary: /var/tmp/824-1000/viewserver-5321-1, curBackup /var/tmp/824-1000/viewserver-5321-2
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 2] curViewnum:2, curPrimary: /var/tmp/824-1000/viewserver-5321-1, curBackup /var/tmp/824-1000/viewserver-5321-2
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 2] curViewnum:2, curPrimary: /var/tmp/824-1000/viewserver-5321-1, curBackup /var/tmp/824-1000/viewserver-5321-2
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 2] curViewnum:2, curPrimary: /var/tmp/824-1000/viewserver-5321-1, curBackup /var/tmp/824-1000/viewserver-5321-2
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 2] curViewnum:2, curPrimary: /var/tmp/824-1000/viewserver-5321-1, curBackup /var/tmp/824-1000/viewserver-5321-2
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 2] curViewnum:2, curPrimary: /var/tmp/824-1000/viewserver-5321-1, curBackup /var/tmp/824-1000/viewserver-5321-2
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 2] curViewnum:2, curPrimary: /var/tmp/824-1000/viewserver-5321-1, curBackup /var/tmp/824-1000/viewserver-5321-2
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 2] curViewnum:2, curPrimary: /var/tmp/824-1000/viewserver-5321-1, curBackup /var/tmp/824-1000/viewserver-5321-2
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 2] curViewnum:3, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup 
+  ... Passed
+Test: Restarted server becomes backup ...
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 3] curViewnum:3, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup 
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 0] curViewnum:4, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 3] curViewnum:4, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup /var/tmp/824-1000/viewserver-5321-1
+  ... Passed
+Test: Idle third server becomes backup if primary fails ...
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 4] curViewnum:4, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 0] curViewnum:4, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 4] curViewnum:4, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 0] curViewnum:4, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 4] curViewnum:4, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 0] curViewnum:4, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 4] curViewnum:4, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 0] curViewnum:4, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 4] curViewnum:4, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 0] curViewnum:4, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 4] curViewnum:4, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 0] curViewnum:4, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 4] curViewnum:4, curPrimary: /var/tmp/824-1000/viewserver-5321-2, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 0] curViewnum:5, curPrimary: /var/tmp/824-1000/viewserver-5321-1, curBackup /var/tmp/824-1000/viewserver-5321-3
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 4] curViewnum:5, curPrimary: /var/tmp/824-1000/viewserver-5321-1, curBackup /var/tmp/824-1000/viewserver-5321-3
+  ... Passed
+Test: Restarted primary treated as dead ...
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 5] curViewnum:5, curPrimary: /var/tmp/824-1000/viewserver-5321-1, curBackup /var/tmp/824-1000/viewserver-5321-3
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 0] curViewnum:6, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 5] curViewnum:6, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+  ... Passed
+Test: Dead backup is removed from view ...
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 6] curViewnum:6, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 6] curViewnum:6, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 6] curViewnum:6, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 6] curViewnum:6, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 6] curViewnum:6, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 6] curViewnum:6, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 7] curViewnum:7, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup 
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 7] curViewnum:7, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup 
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 7] curViewnum:7, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup 
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 7] curViewnum:7, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup 
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 7] curViewnum:7, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup 
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 7] curViewnum:7, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup 
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 7] curViewnum:7, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup 
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 7] curViewnum:7, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup 
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 7] curViewnum:7, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup 
+  ... Passed
+Test: Viewserver waits for primary to ack view ...
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 7] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+  ... Passed
+Test: Uninitialized server can't become primary ...
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-1 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-3 vn: 8] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:8, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-1
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:9, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-2
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:9, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-2
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:9, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-2
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:9, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-2
+[me: /var/tmp/824-1000/viewserver-5321-2 vn: 0] curViewnum:9, curPrimary: /var/tmp/824-1000/viewserver-5321-3, curBackup /var/tmp/824-1000/viewserver-5321-2
+  ... Passed
+PASS
+ok  	_/home/m/6.824/src/viewservice	6.336s
