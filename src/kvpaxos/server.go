@@ -126,9 +126,23 @@ func (kv *KVPaxos) PutAppend(args *PutAppendArgs, reply *PutAppendReply) error {
 	return nil
 }
 
+func (kv *KVPaxos) wait(seq int) {
+	to := 10 * time.Millisecond
+	for {
+		fate, _ := kv.px.Status(seq)
+		if fate == paxos.Decided {
+			return
+		}
+		time.Sleep(to)
+		if to < 10*time.Second {
+			to *= 2
+		}
+	}
+
+}
+
 func (kv *KVPaxos) sync(xop *Op) {
 	seq := kv.seq
-	to := 10 * time.Millisecond
 	DPrintf("[Server]: server %d sync %v\n", kv.me, xop)
 
 	for {
@@ -151,16 +165,12 @@ func (kv *KVPaxos) sync(xop *Op) {
 			}
 			kv.px.Done(seq)
 			seq++
-			to = 10 * time.Millisecond
 		} else {
 			if fate == paxos.Forgotten {
 				DPrintf("!!BUG: paxos forgotten beforehand")
 			}
 			kv.px.Start(seq, *xop)
-			time.Sleep(to)
-			if to < 10*time.Second {
-				to *= 2
-			}
+			kv.wait(seq)
 		}
 	}
 
