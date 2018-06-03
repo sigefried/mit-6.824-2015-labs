@@ -11,7 +11,7 @@ import "os"
 import "syscall"
 import "encoding/gob"
 import "math/rand"
-
+import "time"
 
 const Debug = 0
 
@@ -22,11 +22,17 @@ func DPrintf(format string, a ...interface{}) (n int, err error) {
 	return
 }
 
+const TTLofFilter = 10
+const TickInterval = 100 * time.Millisecond
 
 type Op struct {
 	// Your definitions here.
 	// Field names must start with capital letters,
 	// otherwise RPC will break.
+	OpID  int64
+	Op    string
+	Key   string
+	Value string
 }
 
 type KVPaxos struct {
@@ -38,18 +44,142 @@ type KVPaxos struct {
 	px         *paxos.Paxos
 
 	// Your definitions here.
+	replies map[int64]interface{}
+	filters map[int64]int
+	kvstore map[string]string
+	seq     int
 }
 
+func (kv *KVPaxos) filterDuplicate(opid int64) (interface{}, bool) {
+	_, ok := kv.filters[opid]
+	if !ok {
+		return nil, false
+	}
+	kv.filters[opid] = TTLofFilter
+	rp, _ := kv.replies[opid]
+	return rp, true
+}
+
+func (kv *KVPaxos) recordOperation(opid int64, reply interface{}) {
+	kv.filters[opid] = TTLofFilter
+	kv.replies[opid] = reply
+}
+
+func (kv *KVPaxos) doGet(key string) (value string, ok bool) {
+	value, ok = kv.kvstore[key]
+	return
+}
 
 func (kv *KVPaxos) Get(args *GetArgs, reply *GetReply) error {
 	// Your code here.
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
+	tmp, yes := kv.filterDuplicate(args.OpID)
+	if yes {
+		reply.Value = tmp.(*GetReply).Value
+		reply.Err = tmp.(*GetReply).Err
+		return nil
+	}
+
+	xop := &Op{args.OpID, Get, args.Key, ""}
+	kv.sync(xop)
+
+	value, ok := kv.doGet(xop.Key)
+
+	if ok {
+		reply.Err = OK
+		reply.Value = value
+	} else {
+		reply.Err = ErrNoKey
+	}
+
+	kv.recordOperation(args.OpID, reply)
+
 	return nil
+}
+
+func (kv *KVPaxos) doPutAppend(op string, key string, value string) {
+	if op == Put {
+		kv.kvstore[key] = value
+	} else {
+		kv.kvstore[key] += value
+	}
 }
 
 func (kv *KVPaxos) PutAppend(args *PutAppendArgs, reply *PutAppendReply) error {
 	// Your code here.
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
+	tmp, yes := kv.filterDuplicate(args.OpID)
+	if yes {
+		reply.Err = tmp.(*PutAppendReply).Err
+		return nil
+	}
+
+	xop := &Op{args.OpID, args.Op, args.Key, args.Value}
+	kv.sync(xop)
+	kv.doPutAppend(xop.Op, xop.Key, xop.Value)
+	reply.Err = OK
+
+	kv.recordOperation(args.OpID, reply)
 
 	return nil
+}
+
+func (kv *KVPaxos) sync(xop *Op) {
+	seq := kv.seq
+	to := 10 * time.Millisecond
+	DPrintf("[Server]: server %d sync %v\n", kv.me, xop)
+
+	for {
+		fate, v := kv.px.Status(seq)
+		if fate == paxos.Decided {
+			// when decided
+			op := v.(Op)
+			if xop.OpID == op.OpID {
+				break
+			} else if op.Op == Put || op.Op == Append {
+				kv.doPutAppend(op.Op, op.Key, op.Value)
+				kv.recordOperation(op.OpID, &PutAppendReply{OK})
+			} else {
+				value, ok := kv.doGet(op.Key)
+				if ok {
+					kv.recordOperation(op.OpID, &GetReply{OK, value})
+				} else {
+					kv.recordOperation(op.OpID, &GetReply{ErrNoKey, ""})
+				}
+			}
+			kv.px.Done(seq)
+			seq++
+			to = 10 * time.Millisecond
+		} else {
+			if fate == paxos.Forgotten {
+				DPrintf("!!BUG: paxos forgotten beforehand")
+			}
+			kv.px.Start(seq, *xop)
+			time.Sleep(to)
+			if to < 10*time.Second {
+				to *= 2
+			}
+		}
+	}
+
+	kv.px.Done(seq)
+	kv.seq = seq + 1
+}
+
+// clean the filters with certain TTL
+func (kv *KVPaxos) cleanFilters() {
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
+
+	for id := range kv.filters {
+		kv.filters[id]--
+		if kv.filters[id] <= 0 {
+			delete(kv.filters, id)
+			delete(kv.replies, id)
+		}
+	}
 }
 
 // tell the server to shut itself down.
@@ -94,6 +224,10 @@ func StartServer(servers []string, me int) *KVPaxos {
 	kv.me = me
 
 	// Your initialization code here.
+	kv.seq = 0
+	kv.kvstore = make(map[string]string)
+	kv.replies = make(map[int64]interface{})
+	kv.filters = make(map[int64]int)
 
 	rpcs := rpc.NewServer()
 	rpcs.Register(kv)
@@ -106,7 +240,6 @@ func StartServer(servers []string, me int) *KVPaxos {
 		log.Fatal("listen error: ", e)
 	}
 	kv.l = l
-
 
 	// please do not change any of the following code,
 	// or do anything to subvert it.
@@ -137,6 +270,14 @@ func StartServer(servers []string, me int) *KVPaxos {
 				fmt.Printf("KVPaxos(%v) accept: %v\n", me, err.Error())
 				kv.kill()
 			}
+		}
+	}()
+
+	// run cleaner
+	go func() {
+		for kv.isdead() == false {
+			time.Sleep(TickInterval)
+			kv.cleanFilters()
 		}
 	}()
 
