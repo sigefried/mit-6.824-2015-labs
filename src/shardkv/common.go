@@ -13,6 +13,8 @@ const (
 	OK            = "OK"
 	ErrNoKey      = "ErrNoKey"
 	ErrWrongGroup = "ErrWrongGroup"
+
+	ErrNotReady = "ErrNotReady"
 )
 
 type Err string
@@ -24,7 +26,8 @@ type PutAppendArgs struct {
 	// You'll have to add definitions here.
 	// Field names must start with capital letters,
 	// otherwise RPC will break.
-
+	CID string
+	Seq int
 }
 
 type PutAppendReply struct {
@@ -34,6 +37,8 @@ type PutAppendReply struct {
 type GetArgs struct {
 	Key string
 	// You'll have to add definitions here.
+	CID string
+	Seq int
 }
 
 type GetReply struct {
@@ -41,3 +46,12 @@ type GetReply struct {
 	Value string
 }
 
+type TransferStateArgs struct {
+	ConfigNum int
+	Shard     int
+}
+
+type TransferStateReply struct {
+	Err    Err
+	XState XState
+}
